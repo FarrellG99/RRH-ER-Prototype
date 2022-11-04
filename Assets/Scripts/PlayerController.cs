@@ -71,7 +71,7 @@ public class PlayerController : MonoBehaviour
                 CoyoteJump();
             }
         } else {
-            if (jumpInput && !isJumping)
+            if (jumpInput && isGrounded)
             {
                 Jump();
             }
