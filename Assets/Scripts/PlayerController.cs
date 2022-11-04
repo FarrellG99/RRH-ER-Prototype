@@ -16,12 +16,18 @@ public class PlayerController : MonoBehaviour
     private float runFasterTimer;
     private bool isGrounded;
     private bool jumpInput;
+    private bool jumpInputReleased;
     private bool isJumping;
+
+    [Header("JumpCut")]
+    [SerializeField] bool jumpCut;
+    [SerializeField] float jumpCutMultiplier;
 
     [Header("Coyote Time")]
     [SerializeField] bool coyoteTime;
     [SerializeField] float jumpBufferTime;
     [SerializeField] float groundedTime;
+    [SerializeField] float coyoteJumpForce;
     private float lastGroundedTime;
     private float lastJumpTime;
 
@@ -44,24 +50,38 @@ public class PlayerController : MonoBehaviour
         // Check if the circle overlaps with the ground.
         isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckSize, groundLayer);
         jumpInput = Input.GetButtonDown("Jump");
+        jumpInputReleased = Input.GetButtonUp("Jump");
+        
+        if(isGrounded)
+        {
+            isJumping = false;
+        }
+
         if (coyoteTime)
         {
             if (isGrounded)
             {
-                isJumping = false;
                 lastGroundedTime = groundedTime;
             }
-            if (lastGroundedTime > 0 && lastJumpTime > 0 && !isJumping && jumpInput)
+            if (isGrounded && jumpInput)
             {
                 Jump();
+            } else if(lastGroundedTime > 0 && lastJumpTime < 0 && !isJumping && jumpInput)
+            {
+                CoyoteJump();
             }
         } else {
-            if (jumpInput && isGrounded)
+            if (jumpInput && !isJumping)
             {
                 Jump();
             }
         }
-        
+
+        if (jumpInputReleased && jumpCut)
+        {
+            JumpCut();
+        }
+
     }
 
     // Update is called once per frame
@@ -74,7 +94,6 @@ public class PlayerController : MonoBehaviour
             lastJumpTime -= Time.deltaTime;
         }
         #endregion
-
         Move();
     }
 
@@ -82,10 +101,27 @@ public class PlayerController : MonoBehaviour
     {
         if(coyoteTime)
         {
-            isJumping = true;
+            lastJumpTime = jumpBufferTime;
         }
+        isJumping = true;
         playerRigidbody.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
-        Debug.Log("Jump!");
+        //Debug.Log("Jump!");
+    }
+
+    void CoyoteJump()
+    {
+        lastJumpTime = jumpBufferTime;
+        isJumping = true;
+        playerRigidbody.AddForce(Vector2.up * coyoteJumpForce, ForceMode2D.Impulse);
+    }
+
+    void JumpCut()
+    {
+        if (playerRigidbody.velocity.y > 0)
+        {
+            playerRigidbody.AddForce(Vector2.down * playerRigidbody.velocity.y * (1 - jumpCutMultiplier), ForceMode2D.Impulse);
+            Debug.Log("jump cut");
+        }
     }
 
     void Move()
