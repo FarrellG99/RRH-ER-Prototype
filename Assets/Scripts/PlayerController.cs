@@ -20,7 +20,9 @@ public class PlayerController : MonoBehaviour
     [SerializeField] Transform groundCheck;
     [SerializeField] float groundCheckSize;
     [SerializeField] LayerMask groundLayer;
+    [SerializeField] float checkGroundTime;
     private bool isGrounded;
+    private float checkGroundTimer;
     private bool jumpInput;
     private bool jumpInputReleased;
     private bool isJumping;
@@ -65,10 +67,11 @@ public class PlayerController : MonoBehaviour
         // Get original rotation
         originalRotation = transform.rotation;
 
-        // Setting move forward, run faster timer, sliding timer
+        // Setting move forward, timers
         moveForward = moveSpeed;
         runFasterTimer = runFasterTime;
         slidingTimer = slideTime;
+        checkGroundTimer = checkGroundTime;
 
         //Debug.Log(moveForward);
     }
@@ -82,7 +85,7 @@ public class PlayerController : MonoBehaviour
         slideInput = Input.GetButtonDown("Slide");
         slideInputRelease = Input.GetButtonUp("Slide");
         
-        if(isGrounded)
+        if(isGrounded && checkGroundTimer <= 0)
         {
             isJumping = false;
         }
@@ -102,7 +105,7 @@ public class PlayerController : MonoBehaviour
                 CoyoteJump();
             }
         } else {
-            if (jumpInput && isGrounded)
+            if (jumpInput && !isJumping)
             {
                 Jump();
             }
@@ -121,18 +124,21 @@ public class PlayerController : MonoBehaviour
             SlideCheck();
         }
 
-        if(slideInputRelease || slidingTimer <= 0)
+        if(isSliding)
         {
-            isSliding = false;
-            SlideCheck();
+            if (slideInputRelease || slidingTimer <= 0)
+            {
+                isSliding = false;
+                SlideCheck();
+            }
         }
-
-        
     }
 
     // Update is called once per frame
     void FixedUpdate()
     {
+        checkGroundTimer -= Time.deltaTime;
+
         #region Coyote Timer
         if(coyoteTime)
         {
@@ -151,6 +157,13 @@ public class PlayerController : MonoBehaviour
 
     void Jump()
     {
+        if(isSliding)
+        {
+            isSliding = false;
+            SlideCheck();
+        }
+
+        checkGroundTimer = checkGroundTime;
         if(coyoteTime)
         {
             lastJumpTime = jumpBufferTime;
@@ -162,9 +175,16 @@ public class PlayerController : MonoBehaviour
 
     void CoyoteJump()
     {
+        if (isSliding)
+        {
+            isSliding = false;
+            SlideCheck();
+        }
+
         lastJumpTime = jumpBufferTime;
         isJumping = true;
         playerRigidbody.AddForce(Vector2.up * coyoteJumpForce, ForceMode2D.Impulse);
+        Debug.Log("Coyote jump!");
     }
 
     void JumpCut()
@@ -212,6 +232,10 @@ public class PlayerController : MonoBehaviour
             playerCollider.direction = CapsuleDirection2D.Vertical;
             playerCollider.size = colliderOriginalSize;
             Debug.Log("Stop sliding");
+        }
+        if (isJumping)
+        {
+            JumpCut();
         }
     }
 }

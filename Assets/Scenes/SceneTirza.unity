@@ -438,7 +438,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 9021124198740124951, guid: a4d49f70521b6084d8c90ac69e964696, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -5.5
+      value: -5.72
       objectReference: {fileID: 0}
     - target: {fileID: 9021124198740124951, guid: a4d49f70521b6084d8c90ac69e964696, type: 3}
       propertyPath: m_LocalPosition.z
@@ -1744,7 +1744,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 9021124198740124951, guid: a4d49f70521b6084d8c90ac69e964696, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -5.5
+      value: -5.72
       objectReference: {fileID: 0}
     - target: {fileID: 9021124198740124951, guid: a4d49f70521b6084d8c90ac69e964696, type: 3}
       propertyPath: m_LocalPosition.z
@@ -2851,6 +2851,7 @@ MonoBehaviour:
   groundLayer:
     serializedVersion: 2
     m_Bits: 8
+  checkGroundTime: 0.5
   slideTime: 3
   slidingTargetRotation: {x: 0, y: 0, z: 0.57357645, w: 0.81915206}
   colliderTargetSize: {x: 2.165322, y: 1.603068}
