@@ -24,16 +24,16 @@ public class PlayerController : MonoBehaviour
     [SerializeField] float checkGroundTime;
     private bool isGrounded;
     private float checkGroundTimer;
-    private bool jumpInput;
-    private bool jumpInputReleased;
+    public bool jumpInput;
+    public bool jumpInputReleased;
     private bool isJumping;
 
     [Header("Slide")]
     [SerializeField] float slideTime;
     [SerializeField] Quaternion slidingTargetRotation;
     [SerializeField] Vector2 colliderTargetSize;
-    private bool slideInput;
-    private bool slideInputRelease;
+    public bool slideInput;
+    public bool slideInputRelease;
     private bool isSliding;
     private float slidingTimer;
     private Quaternion originalRotation;
@@ -81,11 +81,15 @@ public class PlayerController : MonoBehaviour
     {
         // Check if the circle overlaps with the ground.
         isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckSize, groundLayer);
-        jumpInput = Input.GetButtonDown("Jump");
-        jumpInputReleased = Input.GetButtonUp("Jump");
-        slideInput = Input.GetButtonDown("Slide");
-        slideInputRelease = Input.GetButtonUp("Slide");
-        
+
+        // Crossplatform for mobile, Input for windows.
+        // Mobile input wont work on PC standalone
+        // To make it work : File > Build Settings > Player Settings > Player > Scroll to "Other Settings" > Scripting Define Symbols + MOBILE_INPUT > Apply
+        jumpInput = CrossPlatformInputManager.GetButtonDown("Jump") || Input.GetButtonDown("Jump");
+        jumpInputReleased = CrossPlatformInputManager.GetButtonUp("Jump") || Input.GetButtonUp("Jump");
+        slideInput = CrossPlatformInputManager.GetButtonDown("Slide") || Input.GetButtonDown("Slide");
+        slideInputRelease = CrossPlatformInputManager.GetButtonUp("Slide") || Input.GetButtonUp("Slide");
+
         if(isGrounded && checkGroundTimer <= 0)
         {
             isJumping = false;
@@ -106,7 +110,7 @@ public class PlayerController : MonoBehaviour
                 CoyoteJump();
             }
         } else {
-            if (jumpInput && !isJumping)
+            if (jumpInput && isGrounded)
             {
                 Jump();
             }
@@ -234,7 +238,7 @@ public class PlayerController : MonoBehaviour
             playerCollider.size = colliderOriginalSize;
             Debug.Log("Stop sliding");
         }
-        if (isJumping)
+        if (!isGrounded)
         {
             JumpCut();
         }
