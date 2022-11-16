@@ -5,8 +5,8 @@ using UnityStandardAssets.CrossPlatformInput;
 
 public class PlayerController : MonoBehaviour
 {
-    [Header("temp")]
-    [SerializeField] Transform model;
+    //[Header("temp")]
+    //[SerializeField] Transform model;
 
     [Header("Movement")]
     [SerializeField] float moveSpeed;
@@ -36,7 +36,7 @@ public class PlayerController : MonoBehaviour
     public bool slideInputRelease;
     private bool isSliding;
     private float slidingTimer;
-    private Quaternion originalRotation;
+    //private Quaternion originalRotation;
     private Vector2 colliderOriginalSize;
 
     [Header("JumpCut")]
@@ -66,7 +66,7 @@ public class PlayerController : MonoBehaviour
         colliderOriginalSize = playerCollider.size;
 
         // Get original rotation
-        originalRotation = transform.rotation;
+        //originalRotation = transform.rotation;
 
         // Setting move forward, timers
         moveForward = moveSpeed;
@@ -221,7 +221,7 @@ public class PlayerController : MonoBehaviour
         if (isSliding)
         {
             // Rotation just for animation
-            model.rotation = Quaternion.Lerp(transform.rotation, slidingTargetRotation, 1f);
+            //model.rotation = Quaternion.Lerp(transform.rotation, slidingTargetRotation, 1f);
 
             // Change Collider Size
             playerCollider.direction = CapsuleDirection2D.Horizontal;
@@ -231,7 +231,7 @@ public class PlayerController : MonoBehaviour
         } else if (!isSliding)
         {
             // Rotation just for animation
-            model.rotation = Quaternion.Lerp(transform.rotation, originalRotation, 1f);
+            //model.rotation = Quaternion.Lerp(transform.rotation, originalRotation, 1f);
 
             // Change Collider Size
             playerCollider.direction = CapsuleDirection2D.Vertical;
