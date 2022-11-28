@@ -11,10 +11,10 @@ TagManager:
   - Ground
   - Water
   - UI
-  - 
-  - 
-  - 
-  - 
+  - Rumput
+  - Layer Depan
+  - Layer Tengah
+  - Layer Belakang
   - 
   - 
   - 
@@ -43,4 +43,7 @@ TagManager:
     locked: 0
   - name: Player
     uniqueID: 1309841401
+    locked: 0
+  - name: Rumput
+    uniqueID: 2842412015
     locked: 0
