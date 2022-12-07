@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityStandardAssets.CrossPlatformInput;
+using UnityEngine.Rendering;
 
 public class PlayerController : MonoBehaviour
 {
@@ -54,10 +55,15 @@ public class PlayerController : MonoBehaviour
     [Header("Movement READONLY")]
     [SerializeField] private float moveForward;
 
+    private SortingGroup playerLayer;
+
 
     // Start is called before the first frame update
     void Start()
     {
+        // Player renderer (Sorting group)
+        playerLayer = gameObject.GetComponent<SortingGroup>();
+
         // Rigidbody
         playerRigidbody = GetComponent<Rigidbody2D>();
 
@@ -256,6 +262,19 @@ public class PlayerController : MonoBehaviour
         if (!isGrounded)
         {
             JumpCut();
+        }
+    }
+
+    private void OnCollisionStay2D(Collision2D collision)
+    {
+        if(GameplayManager.Gameplay.IsFallIntoTheTrap)
+        {
+            if(collision.gameObject.layer == 3)
+            {
+                Physics2D.IgnoreCollision(collision.collider, playerCollider);
+                playerLayer.sortingLayerName = "Default";
+                playerLayer.sortingOrder = 1;
+            }
         }
     }
 }

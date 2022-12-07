@@ -7,6 +7,9 @@ public class GameplayManager : MonoBehaviour
 
     public bool IsPlaying { get; set; }
 
+    // Falling into wolf trap
+    public bool IsFallIntoTheTrap { get; set; }
+
     public static GameplayManager Gameplay;
 
     private void Awake()

@@ -5,9 +5,10 @@ using UnityEngine;
 public class RopeWolf : MonoBehaviour
 {
     [SerializeField] float positionY;
-    [SerializeField] int goUpSpeed;
+    [SerializeField] [Range (0f, 4f)] float goUpSpeed;
+    [SerializeField] float captureDelayTime;
 
-    private int elapsedFrames;
+    private float captureDelayTimer;
     private Vector3 targetPosition;
     bool isCapturing;
 
@@ -15,9 +16,9 @@ public class RopeWolf : MonoBehaviour
 
     private void Start()
     {
+        captureDelayTimer = captureDelayTime;
         targetPosition = new Vector3(transform.position.x, positionY);
         isCapturing = false;
-        elapsedFrames = 0;
         startTime = Time.time;
     }
 
@@ -25,11 +26,12 @@ public class RopeWolf : MonoBehaviour
     {
         if (isCapturing)
         {
-            float interpolant = (float)elapsedFrames / goUpSpeed;
-
-            transform.position = Vector3.Lerp(transform.position, targetPosition, interpolant);
-
-            elapsedFrames = (elapsedFrames + 1) % (goUpSpeed + 1);
+            if(captureDelayTimer > -1)
+            {
+                captureDelayTimer -= Time.fixedDeltaTime;
+            } else if (captureDelayTimer <= 0) {
+                transform.position = Vector3.Lerp(transform.position, targetPosition, goUpSpeed * Time.deltaTime);
+            }
         }
     }
 
