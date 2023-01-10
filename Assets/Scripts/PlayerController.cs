@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityStandardAssets.CrossPlatformInput;
+using UnityEngine.Rendering;
 
 public class PlayerController : MonoBehaviour
 {
@@ -54,10 +55,15 @@ public class PlayerController : MonoBehaviour
     [Header("Movement READONLY")]
     [SerializeField] private float moveForward;
 
+    private SortingGroup playerLayer;
+
 
     // Start is called before the first frame update
     void Start()
     {
+        // Player renderer (Sorting group)
+        playerLayer = gameObject.GetComponent<SortingGroup>();
+
         // Rigidbody
         playerRigidbody = GetComponent<Rigidbody2D>();
 
@@ -75,66 +81,75 @@ public class PlayerController : MonoBehaviour
         checkGroundTimer = checkGroundTime;
 
         //Debug.Log(moveForward);
+
+        // TEMPORARY START
+        GameplayManager.Gameplay.PlayStart();
     }
 
     private void Update()
     {
-        // Check if the circle overlaps with the ground.
-        isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckSize, groundLayer);
-
-        // Crossplatform for mobile, Input for windows.
-        // Mobile input wont work on PC standalone
-        // To make it work : File > Build Settings > Player Settings > Player > Scroll to "Other Settings" > Scripting Define Symbols + MOBILE_INPUT > Apply
-        jumpInput = CrossPlatformInputManager.GetButtonDown("Jump") || Input.GetButtonDown("Jump");
-        jumpInputReleased = CrossPlatformInputManager.GetButtonUp("Jump") || Input.GetButtonUp("Jump");
-        slideInput = CrossPlatformInputManager.GetButtonDown("Slide") || Input.GetButtonDown("Slide");
-        slideInputRelease = CrossPlatformInputManager.GetButtonUp("Slide") || Input.GetButtonUp("Slide");
-
-        if(isGrounded && checkGroundTimer <= 0)
+        if (GameplayManager.Gameplay.IsPlaying)
         {
-            isJumping = false;
-        }
+            // Check if the circle overlaps with the ground.
+            isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckSize, groundLayer);
 
-        // Jump with or without coyote time
-        if (coyoteTime)
-        {
-            if (isGrounded)
+            // Crossplatform for mobile, Input for windows.
+            // Mobile input wont work on PC standalone
+            // To make it work : File > Build Settings > Player Settings > Player > Scroll to "Other Settings" > Scripting Define Symbols + MOBILE_INPUT > Apply
+            jumpInput = CrossPlatformInputManager.GetButtonDown("Jump") || Input.GetButtonDown("Jump");
+            jumpInputReleased = CrossPlatformInputManager.GetButtonUp("Jump") || Input.GetButtonUp("Jump");
+            slideInput = CrossPlatformInputManager.GetButtonDown("Slide") || Input.GetButtonDown("Slide");
+            slideInputRelease = CrossPlatformInputManager.GetButtonUp("Slide") || Input.GetButtonUp("Slide");
+
+            if (isGrounded && checkGroundTimer <= 0)
             {
-                lastGroundedTime = groundedTime;
+                isJumping = false;
             }
-            if (isGrounded && jumpInput)
+
+            // Jump with or without coyote time
+            if (coyoteTime)
             {
-                Jump();
-            } else if(lastGroundedTime > 0 && lastJumpTime < 0 && !isJumping && jumpInput)
-            {
-                CoyoteJump();
+                if (isGrounded)
+                {
+                    lastGroundedTime = groundedTime;
+                }
+                if (isGrounded && jumpInput)
+                {
+                    Jump();
+                }
+                else if (lastGroundedTime > 0 && lastJumpTime < 0 && !isJumping && jumpInput)
+                {
+                    CoyoteJump();
+                }
             }
-        } else {
-            if (jumpInput && isGrounded)
+            else
             {
-                Jump();
+                if (jumpInput && isGrounded)
+                {
+                    Jump();
+                }
             }
-        }
 
-        // Jump Cut
-        if (jumpInputReleased && jumpCut)
-        {
-            JumpCut();
-        }
-
-        // Sliding
-        if(slideInput)
-        {
-            isSliding = true;
-            SlideCheck();
-        }
-
-        if(isSliding)
-        {
-            if (slideInputRelease || slidingTimer <= 0)
+            // Jump Cut
+            if (jumpInputReleased && jumpCut)
             {
-                isSliding = false;
+                JumpCut();
+            }
+
+            // Sliding
+            if (slideInput)
+            {
+                isSliding = true;
                 SlideCheck();
+            }
+
+            if (isSliding)
+            {
+                if (slideInputRelease || slidingTimer <= 0)
+                {
+                    isSliding = false;
+                    SlideCheck();
+                }
             }
         }
     }
@@ -142,22 +157,28 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
-        checkGroundTimer -= Time.deltaTime;
-
-        #region Coyote Timer
-        if(coyoteTime)
+        if (GameplayManager.Gameplay.IsPlaying)
         {
-            lastGroundedTime -= Time.deltaTime;
-            lastJumpTime -= Time.deltaTime;
-        }
-        #endregion
+            checkGroundTimer -= Time.deltaTime;
 
-        if(isSliding)
+            #region Coyote Timer
+            if (coyoteTime)
+            {
+                lastGroundedTime -= Time.deltaTime;
+                lastJumpTime -= Time.deltaTime;
+            }
+            #endregion
+
+            if (isSliding)
+            {
+                slidingTimer -= Time.deltaTime;
+            }
+
+            Move();
+        } else
         {
-            slidingTimer -= Time.deltaTime;
+            playerRigidbody.velocity = new Vector2(0 ,playerRigidbody.velocity.y);
         }
-
-        Move();
     }
 
     void Jump()
@@ -241,6 +262,19 @@ public class PlayerController : MonoBehaviour
         if (!isGrounded)
         {
             JumpCut();
+        }
+    }
+
+    private void OnCollisionStay2D(Collision2D collision)
+    {
+        if(GameplayManager.Gameplay.IsFallIntoTheTrap)
+        {
+            if(collision.gameObject.layer == 3)
+            {
+                Physics2D.IgnoreCollision(collision.collider, playerCollider);
+                playerLayer.sortingLayerName = "Default";
+                playerLayer.sortingOrder = 1;
+            }
         }
     }
 }
