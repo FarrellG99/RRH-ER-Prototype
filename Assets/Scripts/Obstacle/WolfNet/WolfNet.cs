@@ -43,7 +43,6 @@ public class WolfNet : MonoBehaviour
     #region EventAnimation
     public void ThrowNet()
     {
-
         netThrown = true;
     }
     #endregion
