@@ -10,13 +10,13 @@ public class BushWolf : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 
     public void Warning()
@@ -25,18 +25,18 @@ public class BushWolf : MonoBehaviour
         Debug.Log("Warning");
     }
 
-    public void Surprised()
+    public void Surprised(PlayerController player)
     {
         animator.SetTrigger("Surprised");
         Debug.Log("Surprised");
-        GameplayManager.Gameplay.IsPlaying = false;
+        player.Death();
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if(collision.tag == "Player")
+        if (collision.tag == "Player")
         {
-            Surprised();
+            Surprised(collision.GetComponent<PlayerController>());
         }
     }
 }

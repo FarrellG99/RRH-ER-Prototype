@@ -56,6 +56,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float moveForward;
 
     private SortingGroup playerLayer;
+    private Animator animator;
 
 
     // Start is called before the first frame update
@@ -71,6 +72,9 @@ public class PlayerController : MonoBehaviour
         playerCollider = GetComponent<CapsuleCollider2D>();
         colliderOriginalSize = playerCollider.size;
 
+        // Animator
+        animator = GetComponent<Animator>();
+
         // Get original rotation
         //originalRotation = transform.rotation;
 
@@ -83,12 +87,12 @@ public class PlayerController : MonoBehaviour
         //Debug.Log(moveForward);
 
         // TEMPORARY START
-        GameplayManager.Gameplay.PlayStart();
+        GameplayManager.Instance.PlayStart();
     }
 
     private void Update()
     {
-        if (GameplayManager.Gameplay.IsPlaying)
+        if (GameplayManager.Instance.IsPlaying)
         {
             // Check if the circle overlaps with the ground.
             isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckSize, groundLayer);
@@ -151,13 +155,32 @@ public class PlayerController : MonoBehaviour
                     SlideCheck();
                 }
             }
+
+            // Animation
+            if (isJumping)
+            {
+                animator.SetBool("Jump", true);
+            }
+            else
+            {
+                animator.SetBool("Jump", false);
+            }
+
+            if (isSliding)
+            {
+                animator.SetBool("Slide", true);
+            }
+            else
+            {
+                animator.SetBool("Slide", false);
+            }
         }
     }
 
     // Update is called once per frame
     void FixedUpdate()
     {
-        if (GameplayManager.Gameplay.IsPlaying)
+        if (GameplayManager.Instance.IsPlaying)
         {
             checkGroundTimer -= Time.deltaTime;
 
@@ -175,22 +198,23 @@ public class PlayerController : MonoBehaviour
             }
 
             Move();
-        } else
+        }
+        else
         {
-            playerRigidbody.velocity = new Vector2(0 ,playerRigidbody.velocity.y);
+            playerRigidbody.velocity = new Vector2(0, playerRigidbody.velocity.y);
         }
     }
 
     void Jump()
     {
-        if(isSliding)
+        if (isSliding)
         {
             isSliding = false;
             SlideCheck();
         }
 
         checkGroundTimer = checkGroundTime;
-        if(coyoteTime)
+        if (coyoteTime)
         {
             lastJumpTime = jumpBufferTime;
         }
@@ -249,7 +273,8 @@ public class PlayerController : MonoBehaviour
             playerCollider.size = colliderTargetSize;
 
             Debug.Log("Sliding");
-        } else if (!isSliding)
+        }
+        else if (!isSliding)
         {
             // Rotation just for animation
             //model.rotation = Quaternion.Lerp(transform.rotation, originalRotation, 1f);
@@ -267,14 +292,20 @@ public class PlayerController : MonoBehaviour
 
     private void OnCollisionStay2D(Collision2D collision)
     {
-        if(GameplayManager.Gameplay.IsFallIntoTheTrap)
+        if (GameplayManager.Instance.IsFallIntoTheTrap)
         {
-            if(collision.gameObject.layer == 3)
+            if (collision.gameObject.layer == 3)
             {
                 Physics2D.IgnoreCollision(collision.collider, playerCollider);
                 playerLayer.sortingLayerName = "Default";
                 playerLayer.sortingOrder = 1;
             }
         }
+    }
+
+    public void Death()
+    {
+        GameplayManager.Instance.IsPlaying = false;
+        animator.SetTrigger("Dead");
     }
 }

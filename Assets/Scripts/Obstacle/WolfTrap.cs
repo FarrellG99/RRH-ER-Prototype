@@ -6,16 +6,16 @@ public class WolfTrap : MonoBehaviour
 {
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if(collision.tag == "Player")
+        if (collision.tag == "Player")
         {
-            FallIntoTheTrap();
+            FallIntoTheTrap(collision.GetComponent<PlayerController>());
         }
     }
 
-    private void FallIntoTheTrap()
+    private void FallIntoTheTrap(PlayerController player)
     {
-        GameplayManager.Gameplay.IsPlaying = false;
-        GameplayManager.Gameplay.IsFallIntoTheTrap = true;
+        player.Death();
+        GameplayManager.Instance.IsFallIntoTheTrap = true;
         Debug.Log("Fall into the trap");
     }
 }

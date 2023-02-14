@@ -31,7 +31,7 @@ public class WolfNet : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (netThrown == false && GameplayManager.Gameplay.IsPlaying)
+        if (netThrown == false && GameplayManager.Instance.IsPlaying)
         {
             if (other.gameObject.tag == "WolfNetTrigger")
             {

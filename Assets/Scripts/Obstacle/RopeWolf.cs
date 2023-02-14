@@ -38,12 +38,12 @@ public class RopeWolf : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.gameObject.tag == "Player")
-            RopeWolfCapture();
+            RopeWolfCapture(collision.GetComponent<PlayerController>());
     }
 
-    public void RopeWolfCapture()
+    public void RopeWolfCapture(PlayerController player)
     {
-        GameplayManager.Gameplay.IsPlaying = false;
+        player.Death();
         animator.SetTrigger("Capture");
     }
 
