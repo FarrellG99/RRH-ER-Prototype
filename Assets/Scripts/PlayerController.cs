@@ -32,12 +32,14 @@ public class PlayerController : MonoBehaviour
     [Header("Slide")]
     [SerializeField] float slideTime;
     [SerializeField] Quaternion slidingTargetRotation;
+    [SerializeField] Vector2 colliderTargetOffset;
     [SerializeField] Vector2 colliderTargetSize;
     public bool slideInput;
     public bool slideInputRelease;
     private bool isSliding;
     private float slidingTimer;
     //private Quaternion originalRotation;
+    private Vector2 colliderOriginalOffset;
     private Vector2 colliderOriginalSize;
 
     [Header("JumpCut")]
@@ -71,9 +73,10 @@ public class PlayerController : MonoBehaviour
         // Collider and get collider original size
         playerCollider = GetComponent<CapsuleCollider2D>();
         colliderOriginalSize = playerCollider.size;
+        colliderOriginalOffset = playerCollider.offset;
 
         // Animator
-        animator = GetComponent<Animator>();
+        animator = GetComponentInChildren<Animator>();
 
         // Get original rotation
         //originalRotation = transform.rotation;
@@ -271,6 +274,7 @@ public class PlayerController : MonoBehaviour
             // Change Collider Size
             playerCollider.direction = CapsuleDirection2D.Horizontal;
             playerCollider.size = colliderTargetSize;
+            playerCollider.offset = colliderTargetOffset;
 
             Debug.Log("Sliding");
         }
@@ -282,6 +286,7 @@ public class PlayerController : MonoBehaviour
             // Change Collider Size
             playerCollider.direction = CapsuleDirection2D.Vertical;
             playerCollider.size = colliderOriginalSize;
+            playerCollider.offset = colliderOriginalOffset;
             Debug.Log("Stop sliding");
         }
         if (!isGrounded)

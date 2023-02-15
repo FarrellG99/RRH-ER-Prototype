@@ -315,6 +315,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   net: {fileID: 870844862654743403}
   netSpeed: 10
+  netLifeSpawn: 3
 --- !u!70 &870844863019675516
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
