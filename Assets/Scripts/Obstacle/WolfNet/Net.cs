@@ -8,7 +8,7 @@ public class Net : MonoBehaviour
     {
         if (other.gameObject.tag == "Player")
         {
-            GameplayManager.Gameplay.IsPlaying = false;
+            other.gameObject.GetComponent<PlayerController>().Death();
             Debug.Log("Get Caught Wolf Net");
         }
     }

@@ -5,44 +5,50 @@ using UnityEngine;
 public class RopeWolf : MonoBehaviour
 {
     [SerializeField] float positionY;
-    [SerializeField] [Range (0f, 4f)] float goUpSpeed;
-    [SerializeField] float captureDelayTime;
+    [SerializeField] float goUpSpeed;
 
-    private float captureDelayTimer;
+    private float timeElapse;
     private Vector3 targetPosition;
+    private Animator animator;
     bool isCapturing;
 
     private float startTime;
 
     private void Start()
     {
-        captureDelayTimer = captureDelayTime;
+        timeElapse = 0;
         targetPosition = new Vector3(transform.position.x, positionY);
         isCapturing = false;
         startTime = Time.time;
+        animator = gameObject.GetComponent<Animator>();
     }
 
     private void Update()
     {
         if (isCapturing)
         {
-            if(captureDelayTimer > -1)
+            if (timeElapse < goUpSpeed)
             {
-                captureDelayTimer -= Time.fixedDeltaTime;
-            } else if (captureDelayTimer <= 0) {
-                transform.position = Vector3.Lerp(transform.position, targetPosition, goUpSpeed * Time.deltaTime);
+                transform.position = Vector3.Lerp(transform.position, targetPosition, timeElapse / goUpSpeed);
+                timeElapse += Time.deltaTime;
             }
         }
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        RopeWolfCapture();
+        if (collision.gameObject.tag == "Player" && GameplayManager.Instance.IsPlaying)
+            RopeWolfCapture(collision.GetComponent<PlayerController>());
     }
 
-    public void RopeWolfCapture()
+    public void RopeWolfCapture(PlayerController player)
     {
-        GameplayManager.Gameplay.IsPlaying = false;
+        player.Death();
+        animator.SetTrigger("Capture");
+    }
+
+    public void Capturing()
+    {
         isCapturing = true;
     }
 }

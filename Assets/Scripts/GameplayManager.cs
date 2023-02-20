@@ -10,11 +10,11 @@ public class GameplayManager : MonoBehaviour
     // Falling into wolf trap
     public bool IsFallIntoTheTrap { get; set; }
 
-    public static GameplayManager Gameplay;
+    public static GameplayManager Instance;
 
     private void Awake()
     {
-        Gameplay = this;
+        Instance = this;
     }
 
     // Start is called before the first frame update
@@ -26,7 +26,7 @@ public class GameplayManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 
     public void PlayStart()

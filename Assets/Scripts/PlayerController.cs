@@ -6,8 +6,8 @@ using UnityEngine.Rendering;
 
 public class PlayerController : MonoBehaviour
 {
-    [Header("temp")]
-    [SerializeField] Transform model;
+    //[Header("temp")]
+    //[SerializeField] Transform model;
 
     [Header("Movement")]
     [SerializeField] float moveSpeed;
@@ -32,12 +32,14 @@ public class PlayerController : MonoBehaviour
     [Header("Slide")]
     [SerializeField] float slideTime;
     [SerializeField] Quaternion slidingTargetRotation;
+    [SerializeField] Vector2 colliderTargetOffset;
     [SerializeField] Vector2 colliderTargetSize;
     public bool slideInput;
     public bool slideInputRelease;
     private bool isSliding;
     private float slidingTimer;
-    private Quaternion originalRotation;
+    //private Quaternion originalRotation;
+    private Vector2 colliderOriginalOffset;
     private Vector2 colliderOriginalSize;
 
     [Header("JumpCut")]
@@ -56,6 +58,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float moveForward;
 
     private SortingGroup playerLayer;
+    private Animator animator;
 
 
     // Start is called before the first frame update
@@ -70,9 +73,13 @@ public class PlayerController : MonoBehaviour
         // Collider and get collider original size
         playerCollider = GetComponent<CapsuleCollider2D>();
         colliderOriginalSize = playerCollider.size;
+        colliderOriginalOffset = playerCollider.offset;
+
+        // Animator
+        animator = GetComponentInChildren<Animator>();
 
         // Get original rotation
-        originalRotation = transform.rotation;
+        //originalRotation = transform.rotation;
 
         // Setting move forward, timers
         moveForward = moveSpeed;
@@ -83,12 +90,12 @@ public class PlayerController : MonoBehaviour
         //Debug.Log(moveForward);
 
         // TEMPORARY START
-        GameplayManager.Gameplay.PlayStart();
+        GameplayManager.Instance.PlayStart();
     }
 
     private void Update()
     {
-        if (GameplayManager.Gameplay.IsPlaying)
+        if (GameplayManager.Instance.IsPlaying)
         {
             // Check if the circle overlaps with the ground.
             isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckSize, groundLayer);
@@ -151,13 +158,32 @@ public class PlayerController : MonoBehaviour
                     SlideCheck();
                 }
             }
+
+            // Animation
+            if (isJumping)
+            {
+                animator.SetBool("Jump", true);
+            }
+            else
+            {
+                animator.SetBool("Jump", false);
+            }
+
+            if (isSliding)
+            {
+                animator.SetBool("Slide", true);
+            }
+            else
+            {
+                animator.SetBool("Slide", false);
+            }
         }
     }
 
     // Update is called once per frame
     void FixedUpdate()
     {
-        if (GameplayManager.Gameplay.IsPlaying)
+        if (GameplayManager.Instance.IsPlaying)
         {
             checkGroundTimer -= Time.deltaTime;
 
@@ -175,22 +201,23 @@ public class PlayerController : MonoBehaviour
             }
 
             Move();
-        } else
+        }
+        else
         {
-            playerRigidbody.velocity = new Vector2(0 ,playerRigidbody.velocity.y);
+            playerRigidbody.velocity = new Vector2(0, playerRigidbody.velocity.y);
         }
     }
 
     void Jump()
     {
-        if(isSliding)
+        if (isSliding)
         {
             isSliding = false;
             SlideCheck();
         }
 
         checkGroundTimer = checkGroundTime;
-        if(coyoteTime)
+        if (coyoteTime)
         {
             lastJumpTime = jumpBufferTime;
         }
@@ -242,21 +269,24 @@ public class PlayerController : MonoBehaviour
         if (isSliding)
         {
             // Rotation just for animation
-            model.rotation = Quaternion.Lerp(transform.rotation, slidingTargetRotation, 1f);
+            //model.rotation = Quaternion.Lerp(transform.rotation, slidingTargetRotation, 1f);
 
             // Change Collider Size
             playerCollider.direction = CapsuleDirection2D.Horizontal;
             playerCollider.size = colliderTargetSize;
+            playerCollider.offset = colliderTargetOffset;
 
             Debug.Log("Sliding");
-        } else if (!isSliding)
+        }
+        else if (!isSliding)
         {
             // Rotation just for animation
-            model.rotation = Quaternion.Lerp(transform.rotation, originalRotation, 1f);
+            //model.rotation = Quaternion.Lerp(transform.rotation, originalRotation, 1f);
 
             // Change Collider Size
             playerCollider.direction = CapsuleDirection2D.Vertical;
             playerCollider.size = colliderOriginalSize;
+            playerCollider.offset = colliderOriginalOffset;
             Debug.Log("Stop sliding");
         }
         if (!isGrounded)
@@ -267,14 +297,20 @@ public class PlayerController : MonoBehaviour
 
     private void OnCollisionStay2D(Collision2D collision)
     {
-        if(GameplayManager.Gameplay.IsFallIntoTheTrap)
+        if (GameplayManager.Instance.IsFallIntoTheTrap)
         {
-            if(collision.gameObject.layer == 3)
+            if (collision.gameObject.layer == 3)
             {
                 Physics2D.IgnoreCollision(collision.collider, playerCollider);
                 playerLayer.sortingLayerName = "Default";
                 playerLayer.sortingOrder = 1;
             }
         }
+    }
+
+    public void Death()
+    {
+        GameplayManager.Instance.IsPlaying = false;
+        animator.SetTrigger("Dead");
     }
 }

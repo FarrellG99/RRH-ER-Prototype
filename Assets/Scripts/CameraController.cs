@@ -11,7 +11,7 @@ public class CameraController : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
-        if (GameplayManager.Gameplay.IsPlaying)
+        if (GameplayManager.Instance.IsPlaying)
         {
             Vector3 targetPosition = target.position + offset;
             float smoothPosition = Mathf.Lerp(transform.position.y, targetPosition.y, camSmoothSpeed * Time.deltaTime);
