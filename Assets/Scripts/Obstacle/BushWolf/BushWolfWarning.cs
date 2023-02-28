@@ -8,6 +8,7 @@ public class BushWolfWarning : MonoBehaviour
 
     private void OnTriggerStay2D(Collider2D collision)
     {
-        bushWolf.Warning();
+        if (collision.tag == "Player")
+            bushWolf.Warning();
     }
 }
