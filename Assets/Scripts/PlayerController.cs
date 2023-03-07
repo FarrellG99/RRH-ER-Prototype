@@ -303,7 +303,7 @@ public class PlayerController : MonoBehaviour
             {
                 Physics2D.IgnoreCollision(collision.collider, playerCollider);
                 playerLayer.sortingLayerName = "Default";
-                playerLayer.sortingOrder = 1;
+                playerLayer.sortingOrder = 15;
             }
         }
     }
@@ -312,5 +312,10 @@ public class PlayerController : MonoBehaviour
     {
         GameplayManager.Instance.IsPlaying = false;
         animator.SetTrigger("Dead");
+    }
+
+    public Vector3 GetPosition()
+    {
+        return transform.position;
     }
 }
