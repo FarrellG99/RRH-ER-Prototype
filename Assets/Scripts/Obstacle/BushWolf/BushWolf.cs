@@ -7,18 +7,6 @@ public class BushWolf : MonoBehaviour
     [Header("Visual")]
     [SerializeField] Animator animator;
 
-    // Start is called before the first frame update
-    void Start()
-    {
-
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
-
     public void Warning()
     {
         animator.SetBool("Warning", true);
