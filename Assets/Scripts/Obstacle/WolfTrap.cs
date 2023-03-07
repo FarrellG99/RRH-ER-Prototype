@@ -17,5 +17,6 @@ public class WolfTrap : MonoBehaviour
         player.Death();
         GameplayManager.Instance.IsFallIntoTheTrap = true;
         Debug.Log("Fall into the trap");
+        gameObject.GetComponentInChildren<SpriteRenderer>().enabled = false;
     }
 }
