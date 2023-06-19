@@ -3,18 +3,19 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - WolfNetTrigger
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Ground
   - Water
   - UI
-  - 
-  - 
-  - 
-  - 
+  - Rumput
+  - Layer Depan
+  - Layer Tengah
+  - Layer Belakang
   - 
   - 
   - 
@@ -40,4 +41,16 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: Obstacle
+    uniqueID: 4110145695
+    locked: 0
+  - name: Player
+    uniqueID: 1309841401
+    locked: 0
+  - name: WolfNet
+    uniqueID: 3484550085
+    locked: 0
+  - name: Rumput
+    uniqueID: 2842412015
     locked: 0
